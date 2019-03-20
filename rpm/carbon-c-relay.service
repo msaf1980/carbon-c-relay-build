@@ -1,0 +1,26 @@
+# It's not recommended to modify this file in-place, because it will be
+# overwritten during package upgrades. The best way to customize unit files is
+# to add a file with suffix ".conf" to
+# /etc/systemd/system/carbon-c-relay.service.d/
+#
+# For example, if you want to increase carbon-c-relay's open-files-limit to
+# 10000, you need to increase systemd's LimitNOFILE setting in:
+# "/etc/systemd/system/carbon-c-relay.service.d/limits.conf" containing:
+# [Service]
+# LimitNOFILE=10000
+
+[Unit]
+Description=Enhanced C implementation of Carbon relay, aggregator and rewriter
+After=network.target
+
+[Service]
+User=carbon-c-relay
+Type=simple
+EnvironmentFile=-/etc/sysconfig/carbon-c-relay
+ExecStart=/usr/bin/carbon-c-relay -f /etc/carbon-c-relay.conf $ARGS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

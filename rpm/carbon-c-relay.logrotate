@@ -1,0 +1,11 @@
+/var/log/carbon-c-relay/carbon-c-relay.log
+{
+  sharedscripts
+  missingok
+  notifempty
+  rotate 30
+  compress
+  postrotate
+    [ ! -f /var/run/carbon-c-relay/carbon-c-relay.pid ] || /bin/kill -HUP $(cat /var/run/carbon-c-relay/carbon-c-relay.pid)
+  endscript
+}

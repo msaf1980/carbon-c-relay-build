@@ -1,0 +1,12 @@
+# If you need to change execution environment configuration (e.g. limits) you
+# can set it below. Don't forget to run `systemctl daemon-reload` and
+# `systemctl restart carbon-c-relay` to make your changes effective.
+#
+# See "man systemd.exec" for information.
+
+# For example, to increase the maximum number of file descriptors (open
+# connections) uncomment following lines.
+#
+#[Service]
+#LimitNOFILE=4096
+
