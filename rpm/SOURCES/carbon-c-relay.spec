@@ -16,7 +16,7 @@ Summary:            Enhanced C implementation of Carbon relay, aggregator and re
 License:            ASL 2.0
 Group:              System Environment/Daemons
 URL:                https://github.com/grobian/carbon-c-relay
-Source0:            https://github.com/msaf1980/carbon-c-relay/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+Source0:            https://github.com/msaf1980/carbon-c-relay/archive/%{commit}/%{name}-%{version}.%{rel}.tbz
 Source1:            carbon-c-relay.service
 Source2:            carbon-c-relay.init
 Source3:            carbon-c-relay.logrotate
@@ -70,7 +70,7 @@ clusters for each and every metric based on pattern matches.
 
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{version}.%{rel}
 rm conffile.tab.c conffile.tab.h conffile.yy.c
 
 
