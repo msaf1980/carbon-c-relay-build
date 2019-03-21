@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL=https://github.com/msaf1980/carbon-c-relay.git
+unset URL
 BRANCH=master
 unset COMMIT
 
@@ -33,7 +33,7 @@ git_version() {
 
         if echo $VERSION | egrep '^v[0-9]+\.[0-9]+$' >/dev/null; then
             VERSION=${VERSION:1:${#VERSION}}
-        else
+        elif ! echo $VERSION | egrep '^[0-9]+\.[0-9]+$' >/dev/null; then
             echo "failed to extract version from ${GIT_VERSION}" >&2
             return 1
         fi
@@ -42,15 +42,51 @@ git_version() {
     return 1
 }
 
+git_last_commit() {
+    COMMIT=$( git log -n 1 --pretty=format:'%H' )
+    [ "$?" == "0" ] && return 0 || return 1
+}
+
 git_commit() {
-    if [ -n "${COMMIT}" ]; then
-        git reset --hard "${SCN}" || return 1
+    if [ -z "${COMMIT}" ]; then
+        git_last_commit || return 1
     else
-        COMMIT=$( git log -n 1 --pretty=format:'%H' )
-        [ "$?" == "0" ] || return 1
+        echo "reset to commit ${COMMIT}"
+        git reset --hard ${COMMIT} || return 1
+        NEEDCOMMIT="${COMMIT}"
+        git_last_commit || return 1
+        if [ "${NEEDCOMMIT}" != "${COMMIT}" ]; then
+    	    echo "unable to reset to ${NEEDCOMMIT}, current commit is ${COMMIT}" >&2
+    	    return 1
+        fi
     fi
     return 0
 }
+
+usage() {
+  echo "use: $0 -u GIT_URL [-b BRANCH] [-c COMMIT]" >&2
+  exit 1
+}
+
+while getopts "u:b:c:h" opt ; do
+    case $opt in
+	u)
+	    URL="$OPTARG"
+	    ;;
+	b) 
+	    BRANCH="$OPTARG"
+	    ;;
+	c) 
+	    COMMIT="$OPTARG"
+	    ;;
+	h)
+	    usage
+	    ;;
+esac
+done
+
+[ -z "${URL}" ] && usage
+[ -n "${BRANCH}" ] || usage
 
 NAME=$( basename ${URL} | sed -e 's/\.git$//' )
 
@@ -61,9 +97,9 @@ NAME=$( basename ${URL} | sed -e 's/\.git$//' )
 if [ -d "${NAME}" ]; then
     #git_pull_branch || exit 1
     rm -rf "${NAME}" || exit 1
-else
-    git_clone || exit 1
 fi
+git_clone || exit 1
+#fi
 
 git_commit || exit 1
 git_version || exit 1
@@ -80,11 +116,13 @@ tar -cjf "${SOURCEDIR}/${NAME}-${VERSION}.${RELEASE}.tbz" "${NAME}-${VERSION}.${
 cp -f SOURCES/* "${SOURCEDIR}/"  || exit 1
 
 cd "${SOURCEDIR}" && {
-  rpmbuild -ba "${SOURCEDIR}/${NAME}.spec" --define "vers ${VERSION}" --define "rel ${RELEASE}" --define "commit ${COMMIT}" && {
-    exit 1
-  } || {
+  rpmbuild -ba "${SOURCEDIR}/${NAME}.spec" --define "vers ${VERSION}" --define "rel ${RELEASE}" --define "commit ${COMMIT}" || {
     echo "Build failed !! Fix and run" >&2
     echo rpmbuild -ba \"${SOURCEDIR}/${NAME}.spec\" --define \"vers ${VERSION}\" --define \"rel ${RELEASE}\" --define \"commit ${COMMIT}\" >&2
+    exit 1
   }
+} || {
+    exit 1
 }
-exit 1
+
+exit 0
