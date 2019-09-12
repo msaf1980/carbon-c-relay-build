@@ -70,7 +70,7 @@ clusters for each and every metric based on pattern matches.
 
 
 %prep
-%autosetup -n %{name}-%{version}.%{rel}
+%autosetup -n %{name}
 rm conffile.tab.c conffile.tab.h conffile.yy.c
 
 
