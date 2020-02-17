@@ -11,7 +11,7 @@
 
 %global appname carbon-c-relay
 
-Name:               carbon-c-relay-onig
+Name:               carbon-c-relay
 Version:            %{vers}
 Release:            %{rel}%{?dist}
 Summary:            Enhanced C implementation of Carbon relay, aggregator and rewriter
