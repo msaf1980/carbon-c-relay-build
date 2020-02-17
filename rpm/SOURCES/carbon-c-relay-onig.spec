@@ -32,6 +32,7 @@ BuildRequires:      make
 BuildRequires:      bison
 BuildRequires:      flex
 BuildRequires:      oniguruma-devel
+BuildRequires:      libevent-devel
 
 # use nodejs-ronn instead of ruby ronn because of availability on epel 6 & 7
 %if 0%{?build_manpage}
